@@ -3,7 +3,7 @@ import KP
 
 equ = charEqu 5e-10 1e-10 1.4
 
--- main = mapM_ putStrLn [show x ++ ", " ++ show (equ x) | x <- [0.01, 0.02 .. 50]]
+-- main = mapM_ putStrLn [show x ++ ", " ++ show (equ x) | x <- [0.01, 0.02 .. 500]]
 main = mapM_ putStrLn [show x ++ ", " ++ show (bandGaps !! x) ++ ", " ++ show (allowedBands !! x)| x <- [0, 1 .. 20]]
 
 bandEdges = [getEdge equ (x + 0.000001) | x <- 0:bandEdges]
@@ -34,4 +34,4 @@ approxNextEdge func start =
       firstSign = signum $ snd (head funcVals) - edgeSign
       funcVals = zip xs (map func xs)
         where
-          xs = [start, start + 0.001 ..]
+          xs = [start, start + 0.0001 ..]
