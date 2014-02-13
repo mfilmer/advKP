@@ -17,7 +17,7 @@ step func x = (m*x - func x) / m
     m = slope func x
 
 solve :: (Double -> Double) -> Double -> Double
-solve func x = iterate (step func) x !! 35
+solve func guess = iterate (step func) guess !! 35
 
 guess :: (Double -> Double) -> (Double, Double) -> Double
 guess func (start, stop) = xValues !! (fromJust $ elemIndex (minimum funcVals) funcVals)
