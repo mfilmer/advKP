@@ -12,9 +12,7 @@ slope func x = (func (x+inc) - func (x-inc))/(2*inc)
             else x * epsilon
 
 step :: (Double -> Double) -> Double -> Double
-step func x = (m*x - func x) / m
-  where
-    m = slope func x
+step func x = x - (func x) / (slope func x)
 
 solve :: (Double -> Double) -> Double -> Double
 solve func guess = iterate (step func) guess !! 35
