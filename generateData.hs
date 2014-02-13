@@ -4,9 +4,13 @@ import KP
 equ = charEqu 5e-10 1e-10 1.4
 
 -- main = mapM_ putStrLn [show x ++ ", " ++ show (equ x) | x <- [0.01, 0.02 .. 50]]
-main = mapM_ putStrLn [show x ++ ", " ++ show (equ x) | x <- [0.01, 0.02 .. 50]]
+main = mapM_ putStrLn [show x ++ ", " ++ show (bandGaps !! x) ++ ", " ++ show (allowedBands !! x)| x <- [0, 1 .. 20]]
 
 bandEdges = [getEdge equ (x + 0.000001) | x <- 0:bandEdges]
+
+diffs (a:b:xs) = (b - a):(diffs xs)
+bandGaps = diffs (tail bandEdges)
+allowedBands = diffs bandEdges
 
 -- getEdge takes a function and a starting point
 -- and returns the next band edge
