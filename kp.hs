@@ -14,6 +14,7 @@ hbar = 1.0546e-34   -- [J s]
 -- e   -> energy          [eV]
 charEqu a b v_0 0 = charEqu a b v_0 1e-16
 charEqu a b v_0eV eeV
+  | xi == 0 = cosh(b*d) + 1/2*a*d*sinh(b*d)
   | xi < 1 = (1-2*xi)/(2*sqrt(xi*(1-xi)))*sin(a_0*a*sqrt xi)*sinh(a_0*b*sqrt(1-xi)) + cos(a_0*a*sqrt(xi))*cosh(a_0*b*sqrt(1-xi))
   |otherwise = (1-2*xi)/(2*sqrt(xi*(xi-1)))*sin(a_0*a*sqrt xi)*sin(a_0*b*sqrt(xi-1)) + cos(a_0*a*sqrt(xi))*cos(a_0*b*sqrt(xi-1))
     where
