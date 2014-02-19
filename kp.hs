@@ -10,8 +10,8 @@ hbar = 1.0546e-34   -- [J s]
 -- KP model characteristic equation
 -- a   -> well width      [m]
 -- b   -> barrier width   [m]
--- v_0 -> barrier height  [J]
--- e   -> energy          [J]
+-- v_0 -> barrier height  [eV]
+-- e   -> energy          [eV]
 charEqu a b v_0 0 = charEqu a b v_0 1e-16
 charEqu a b v_0eV eeV
   | xi < 1 = (1-2*xi)/(2*sqrt(xi*(1-xi)))*sin(a_0*a*sqrt xi)*sinh(a_0*b*sqrt(1-xi)) + cos(a_0*a*sqrt(xi))*cosh(a_0*b*sqrt(1-xi))
