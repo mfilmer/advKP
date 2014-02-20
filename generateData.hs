@@ -7,7 +7,7 @@ primaryIntervals func =
 primaryRoots func =  map (ridder func) (primaryIntervals func)
 
 secondaryIntervals func =
-  concat [[(x1, ext x1 x2), (ext x1 x2, x2)] | (x1, x2) <- first:intervals]
+  first:concat [[(x1, ext x1 x2), (ext x1 x2, x2)] | (x1, x2) <- intervals]
     where
       intervals = zip (primaryRoots func) $ tail $ primaryRoots func
       ext x1 x2 = findExtreme func (x1, x2)
@@ -23,6 +23,29 @@ secondaryRoots func =
 
 findExtreme func (start, stop) =
   bisection (numDeriv func) (start, stop)
+
+diffs :: Num a => [a] -> [a]
+diffs [] = []
+diffs (_:[]) = []
+diffs (a:b:[]) = [(b-a)]
+diffs (a:b:xs) = (b-a):diffs xs
+
+group :: [a] -> [(a, a)]
+group [] = []
+group (_:[]) = []
+group (a:b:[]) = [(a,b)]
+group (a:b:xs) = (a,b):group xs
+
+-- Do actual data generation
+sampEqu = charEqu 1e-10 5e-10 3
+allowedBands = group $ secondaryRoots sampEqu
+forbiddenRegions = group $ tail $ secondaryRoots sampEqu
+
+
+-- Plot energy band vs band number
+main = mapM_ putStrLn $ map show [b - a | (a,b) <- zip secRoots (tail secRoots)]
+  where
+    secRoots = secondaryRoots sampEqu
 
 -- Plot the characteristic equation
 --e = [0.0, 0.0001 ..]
