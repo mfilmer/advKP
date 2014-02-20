@@ -14,7 +14,14 @@
 --  You should have received a copy of the GNU General Public License
 --  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-module Solve (search, bisection, ridder, newton, simpNewton, numDeriv) where
+module Solve 
+  (search,
+  bisection,
+  ridder,
+  newton,
+  simpNewton,
+  simpFullNewton,
+  numDeriv) where
 
 -- search: Approximate the root of a function given a starting point
 --         and an increment
