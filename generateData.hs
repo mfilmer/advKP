@@ -1,20 +1,27 @@
 import Solve
 import KP
 
-primaryIntervals a b v_0 =
-  [search (charEqu a b v_0) start 1e-2  | (_, start) <- (0,0):primaryIntervals a b v_0]
-primaryRoots a b v_0 =  map (ridder (charEqu a b v_0)) (primaryIntervals a b v_0)
+primaryIntervals func = 
+  [search func start 1e-2  | (_, start) <- (0,0):primaryIntervals func]
 
--- Function to calculate two secondary roots given bounds
--- func -> function of one variable where func(start) == func(stop) == 0
--- start, stop -> beginning and ending respectively of the region to solve
-calcSecondaryRoots func (start, stop) =
-  undefined
+primaryRoots func =  map (ridder func) (primaryIntervals func)
 
--- Find the location of the extreme value (max or min) 
--- of the function on the interval (start, stop)
+secondaryIntervals func =
+  concat [[(x1, ext x1 x2), (ext x1 x2, x2)] | (x1, x2) <- intervals]
+    where
+      intervals = zip (primaryRoots func) $ tail $ primaryRoots func
+      ext x1 x2 = findExtreme func (x1, x2)
+
+secondaryRoots func =
+  map (solve func) $ secondaryIntervals func
+  where
+    solve func int@(x1, x2) = ridder modFunc int
+      where
+        modFunc x = func x - offset
+        offset = signum $ func $ (x2 + x1) / 2
+
 findExtreme func (start, stop) =
-  ridder (numDeriv func) (start, stop)
+  bisection (numDeriv func) (start, stop)
 
 -- Plot the characteristic equation
 --e = [0.0, 0.0001 ..]

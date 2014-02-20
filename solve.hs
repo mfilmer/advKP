@@ -41,7 +41,7 @@ bisection func (low, high)
     where
       mid = (high + low) / 2
 
-ridder :: (Floating a, Ord a) => (a -> a) -> (a, a) -> a
+--ridder :: (Floating a, Ord a) => (a -> a) -> (a, a) -> a
 ridder func (low, high)
   | abs (high - low) < precision = mid
   | otherwise = if midV * rootV <= 0
@@ -56,9 +56,10 @@ ridder func (low, high)
       midV = func mid
       highV = func high
       rootV = func root
-      root
-        | lowV > highV = mid + (mid - low) * midV / sqrt (midV**2 - lowV*highV)
-        | otherwise = mid - (mid - low) * midV / sqrt (midV**2 - lowV*highV)
+      root = mid + (mid - low)*signum(lowV - highV)*midV/sqrt(midV**2-lowV*highV)
+      --root
+      --  | lowV > highV = mid + (mid - low) * midV / sqrt (midV**2 - lowV*highV)
+      --  | otherwise = mid - (mid - low) * midV / sqrt (midV**2 - lowV*highV)
       precision = max (abs mid * 1e-14) 1e-14
 
 -- Find a root using Newton's Method, iterating until the root doesn't change
