@@ -38,17 +38,20 @@ group (a:b:xs) = (a,b):group xs
 
 -- Do actual data generation
 sampEqu = charEqu 1e-10 5e-10 3
+
 allowedBands = group $ secondaryRoots sampEqu
 forbiddenRegions = group $ tail $ secondaryRoots sampEqu
 
+allowedWidths = [b - a | (a,b) <- allowedBands]
+forbiddenWidths = [b - a | (a,b) <- forbiddenRegions]
+
 
 -- Plot energy band vs band number
-main = mapM_ putStrLn $ map show [b - a | (a,b) <- zip secRoots (tail secRoots)]
-  where
-    secRoots = secondaryRoots sampEqu
+--main = mapM_ putStrLn $ [show a ++ ", " ++ show b | (a,b) <- zip [1,2 ..] allowedWidths]
+
+-- Plot band gaps vs band number
+--main = mapM_ putStrLn $ [show a ++ ", " ++ show b | (a,b) <- zip [1,2 ..] forbiddenWidths]
 
 -- Plot the characteristic equation
---e = [0.0, 0.0001 ..]
---main = mapM_ putStrLn $ [show a ++ ", " ++ show b | (a,b) <- zip e (map equ e)]
---  where
---    equ = charEqu 1e-10 5e-10 3
+e = [0.0, 0.0001 ..]
+main = mapM_ putStrLn $ [show a ++ ", " ++ show b | (a,b) <- zip e (map sampEqu e)]
