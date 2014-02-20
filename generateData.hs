@@ -7,10 +7,11 @@ primaryIntervals func =
 primaryRoots func =  map (ridder func) (primaryIntervals func)
 
 secondaryIntervals func =
-  concat [[(x1, ext x1 x2), (ext x1 x2, x2)] | (x1, x2) <- intervals]
+  concat [[(x1, ext x1 x2), (ext x1 x2, x2)] | (x1, x2) <- first:intervals]
     where
       intervals = zip (primaryRoots func) $ tail $ primaryRoots func
       ext x1 x2 = findExtreme func (x1, x2)
+      first = (0, fst (head intervals))
 
 secondaryRoots func =
   map (solve func) $ secondaryIntervals func
