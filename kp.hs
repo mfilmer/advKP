@@ -21,6 +21,13 @@ charEqu a b v_0eV eeV
       v_0 = evToJ v_0eV
       e = evToJ eeV
 
+simpCharEqu a b v_0eV eeV = p * sin (alpha*a) / (alpha*a) + cos (alpha*a)
+  where
+    p = scatteringPower a b v_0eV
+    alpha = sqrt $ 2 * m * e / hbar**2
+    v_0 = evToJ v_0eV
+    e = evToJ eeV
+
 scatteringPower a b v_0eV = m * v_0 * a * b / hbar**2
   where v_0 = evToJ v_0eV
 
