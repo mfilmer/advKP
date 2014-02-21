@@ -71,7 +71,7 @@ v_0' = linspace 0.5 5 5       -- [eV]
 inputs = filter pred inputs'
   where
     inputs' = cartProd3 a' b' v_0'
-    pred (a,b,v) = if charEqu a b v 0 > 1.3
+    pred (a,b,v) = if charEqu a b v 0 > 2.0
                     then True
                     else False
 ps = map (uncurry3 scatteringPower) inputs
