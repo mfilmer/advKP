@@ -3,7 +3,7 @@ import Data.List
 import Data.Maybe
 
 -- Made up number for epsilon, probably shouldn't call it epsilon... that's confusing
-epsilon = 1e-5
+--epsilon = 1e-10
 slope :: (Double -> Double) -> Double -> Double
 slope func x = (func (x+inc) - func (x-inc))/(2*inc)
   where
