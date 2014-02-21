@@ -82,13 +82,16 @@ firstEnergy = map (nthGapEnergy 1) equs
 simpFirstEnergy = map (nthGapEnergy 1) simpEqus
 
 -- Display csv style
-displayData ins p energy simpEnergy = do
-  putStrLn "a, b, v_0, p, gap energy, simple energy"
-  mapM_ putStrLn $ map csvify6 $ zip6 a b c p energy simpEnergy
+displayData ins p simpEnergy normSimpEnergy = do
+  putStrLn "a, b, v_0, p, gap energy, norm gap energy"
+  mapM_ putStrLn $ map csvify6 $ zip6 a b c p simpEnergy  normSimpEnergy
     where
       (a,b,c) = unzip3 ins
 
-main = displayData inputs ps firstEnergy simpFirstEnergy
+main = displayData inputs ps simpFirstEnergy normSimpEnergy
+  where
+    normSimpEnergy = map (uncurry normalize) $ zip a simpFirstEnergy
+    (a,_,_) = unzip3 inputs
 -- Plot energy band vs band number
 --main = mapM_ putStrLn $ [show a ++ ", " ++ show b | (a,b) <- zip [1,2 ..] allowedWidths]
 

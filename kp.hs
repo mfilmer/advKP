@@ -35,6 +35,8 @@ scatteringPower a b v_0eV = m * v_0 * a * b / hbar**2
 evToJ eV = eV * q
 jToEv j = j / q
 
+normalize a e = evToJ e * (a**2 * m * 2) / (hbar**2 * pi**2)
+
 -- Other functions
 log10 = logBase 10
 linspace start stop count = [start, start + step .. stop]
