@@ -51,7 +51,7 @@ csvify6 (a,b,c,d,e,f) = show a ++ ", " ++ show b ++ ", " ++ show c ++ ", " ++ sh
 ---------- Do actual data generation ----------
 --sampEqu = charEqu 1e-10 5e-10 3
 --sampEqu = charEqu 1e-11 1e-11 0.5
-sampEqu = (uncurry3 charEqu) (inputs !! 102)
+sampEqu = (uncurry3 charEqu) (inputs !! 315)
 
 allowedBands func = group $ secondaryRoots func
 forbiddenRegions func = group $ tail $ secondaryRoots func
@@ -63,14 +63,14 @@ nthBandEnergy n func = allowedWidths func !! (n - 1)
 nthGapEnergy n func = forbiddenWidths func !! (n - 1)
 
 -- Vary everything and calculate everything
-a' = linspace 1e-10 5e-9 11    -- [m]
-b' = linspace 1e-10 5e-9 11    -- [m]
-v_0' = linspace 0.5 5 5       -- [eV]
+a' = logspace 1e-10 5e-9 21    -- [m]
+b' = logspace 1e-10 5e-9 21    -- [m]
+v_0' = logspace 0.5 5 11       -- [eV]
 
 inputs = filter pred inputs'
   where
     inputs' = cartProd3 a' b' v_0'
-    pred (a,b,v) = if charEqu a b v 0 > 2.0
+    pred (a,b,v) = if charEqu a b v 0 > 2.0 && charEqu a b v 0 < 1e10
                     then True
                     else False
 ps = map (uncurry3 scatteringPower) inputs
@@ -82,16 +82,18 @@ firstEnergy = map (nthGapEnergy 1) equs
 simpFirstEnergy = map (nthGapEnergy 1) simpEqus
 
 -- Display csv style
-displayData ins p simpEnergy normSimpEnergy = do
-  putStrLn "a, b, v_0, p, gap energy, norm gap energy"
-  mapM_ putStrLn $ map csvify6 $ zip6 a b c p simpEnergy  normSimpEnergy
+displayData ins p normEnergy normSimpEnergy = do
+  putStrLn "a, b, v_0, p, norm energy, norm simp energy"
+  mapM_ putStrLn $ map csvify6 $ zip6 a b c p normEnergy normSimpEnergy
     where
       (a,b,c) = unzip3 ins
 
-main = displayData inputs ps simpFirstEnergy normSimpEnergy
+main = displayData inputs ps normEnergy normSimpEnergy
   where
     normSimpEnergy = map (uncurry normalize) $ zip a simpFirstEnergy
+    normEnergy = map (uncurry normalize) $ zip a firstEnergy
     (a,_,_) = unzip3 inputs
+
 -- Plot energy band vs band number
 --main = mapM_ putStrLn $ [show a ++ ", " ++ show b | (a,b) <- zip [1,2 ..] allowedWidths]
 
