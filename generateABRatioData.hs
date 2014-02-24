@@ -28,6 +28,15 @@ secondaryRoots func =
 findExtreme func (start, stop) =
   bisection (numDeriv func) (start, stop)
 
+allowedBands func = group $ secondaryRoots func
+forbiddenRegions func = group $ tail $ secondaryRoots func
+
+allowedWidths func = [b - a | (a,b) <- allowedBands func]
+forbiddenWidths func = [b - a | (a,b) <- forbiddenRegions func]
+
+nthBandEnergy n func = allowedWidths func !! (n - 1)
+nthGapEnergy n func = forbiddenWidths func !! (n - 1)
+
 ---------- Other Functions ----------
 group :: [a] -> [(a, a)]
 group [] = []
@@ -54,15 +63,6 @@ csvify6 (a,b,c,d,e,f) = show a ++ ", " ++ show b ++ ", " ++ show c ++ ", " ++ sh
 --sampEqu = charEqu 1e-10 5e-10 3
 --sampEqu = charEqu 1e-11 1e-11 0.5
 sampEqu = (uncurry3 charEqu) (inputs !! 315)
-
-allowedBands func = group $ secondaryRoots func
-forbiddenRegions func = group $ tail $ secondaryRoots func
-
-allowedWidths func = [b - a | (a,b) <- allowedBands func]
-forbiddenWidths func = [b - a | (a,b) <- forbiddenRegions func]
-
-nthBandEnergy n func = allowedWidths func !! (n - 1)
-nthGapEnergy n func = forbiddenWidths func !! (n - 1)
 
 -- Vary everything and calculate everything
 a' = logspace 1e-10 5e-9 21    -- [m]
