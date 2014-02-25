@@ -65,20 +65,20 @@ csvify7 (a,b,c,d,e,f,g) = concat $ intersperse ", " $ map show items
 
 ---------- Data Generation Related Functions ----------
 -- Return columns: a, b, v_0, p, ratio
-getParams :: [Double] -> Double -> [(Double, Double, Double, Double, Double)]
-getParams xs ratio =
-  concat [[(a p v_0, b (a p v_0), v_0, p, ratio) | p <- xs] | v_0 <- v0s]
+getParams :: [Double] -> [Double] -> Double -> [(Double, Double, Double, Double, Double)]
+getParams ps v0s ratio =
+  concat [[(a p v_0, b (a p v_0), v_0, p, ratio) | p <- ps] | v_0 <- v0s]
     where
-      v0s = logspace 0.5 5 11
-      a p v_0 = hbar * sqrt ((p * ratio) / (m * v_0))
+      a p v_0eV = hbar * sqrt ((p * ratio) / (m * evToJ v_0eV))
       b a = a / ratio
 
 ---------- Do actual data generation ----------
 sPowers = logspace 0.1 1000 31
+bHeights = logspace 0.5 5 11
 ratios = logspace 0.05 20 6
 
 -- rawInputs: [(a, b, v_0, p, ratio)]
-rawInputs = concat $ map (getParams sPowers) ratios
+rawInputs = concat $ map (getParams sPowers bHeights) ratios
 
 inputs = filter pred rawInputs
   where
