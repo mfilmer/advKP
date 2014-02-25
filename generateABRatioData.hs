@@ -67,14 +67,14 @@ csvify7 (a,b,c,d,e,f,g) = concat $ intersperse ", " $ map show items
 -- Return columns: a, b, v_0, p, ratio
 getParams :: [Double] -> [Double] -> Double -> [(Double, Double, Double, Double, Double)]
 getParams ps v0s ratio =
-  concat [[(a p v_0, b (a p v_0), v_0, p, ratio) | p <- ps] | v_0 <- v0s]
+  [(a p v_0, b (a p v_0), v_0, p, ratio) | p <- ps, v_0 <- v0s]
     where
       a p v_0eV = hbar * sqrt ((p * ratio) / (m * evToJ v_0eV))
       b a = a / ratio
 
 ---------- Do actual data generation ----------
 sPowers = logspace 0.1 1000 31
-bHeights = logspace 0.5 5 11
+bHeights = logspace 0.5 10 5
 ratios = logspace 0.05 20 6
 
 -- rawInputs: [(a, b, v_0, p, ratio)]
@@ -82,7 +82,7 @@ rawInputs = concat $ map (getParams sPowers bHeights) ratios
 
 inputs = filter pred rawInputs
   where
-    pred (a,b,v,_,_) = if charEqu a b v 0 > 2.0 && charEqu a b v 0 < 1e10
+    pred (a,b,v,_,_) = if a < 6e-9 && b < 1e-8 && charEqu a b v 0 > 2.0 && charEqu a b v 0 < 1e10
                             then True
                             else False
 
