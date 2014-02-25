@@ -2,7 +2,8 @@
 
 import Solve
 import KP
-import Data.List (zip6)
+import Data.List (zip7,unzip5,intersperse)
+import Control.Applicative ((<*>))
 
 ---------- Root finding ----------
 primaryIntervals func = 
@@ -53,55 +54,53 @@ uncurry3 f (a, b, c)       = f a b c
 uncurry4 f (a, b, c, d)    = f a b c d
 uncurry5 f (a, b, c, d, e) = f a b c d e
 
-csvify2 (a,b)         = show a ++ ", " ++ show b
-csvify3 (a,b,c)       = show a ++ ", " ++ show b ++ ", " ++ show c
-csvify4 (a,b,c,d)     = show a ++ ", " ++ show b ++ ", " ++ show c ++ ", " ++ show d
-csvify5 (a,b,c,d,e)   = show a ++ ", " ++ show b ++ ", " ++ show c ++ ", " ++ show d ++ ", " ++ show e
-csvify6 (a,b,c,d,e,f) = show a ++ ", " ++ show b ++ ", " ++ show c ++ ", " ++ show d ++ ", " ++ show e ++ ", " ++ show f
+csvify2 (a,b)           = show a ++ ", " ++ show b
+csvify3 (a,b,c)         = show a ++ ", " ++ show b ++ ", " ++ show c
+csvify4 (a,b,c,d)       = show a ++ ", " ++ show b ++ ", " ++ show c ++ ", " ++ show d
+csvify5 (a,b,c,d,e)     = show a ++ ", " ++ show b ++ ", " ++ show c ++ ", " ++ show d ++ ", " ++ show e
+csvify6 (a,b,c,d,e,f)   = show a ++ ", " ++ show b ++ ", " ++ show c ++ ", " ++ show d ++ ", " ++ show e ++ ", " ++ show f
+--csvify7 (a,b,c,d,e,f,g) = show a ++ ", " ++ show b ++ ", " ++ show c ++ ", " ++ show d ++ ", " ++ show e ++ ", " ++ show f ++ ", " ++ show g
+csvify7 (a,b,c,d,e,f,g) = concat $ intersperse ", " $ map show items
+  where items = [a,b,c,d,e,f,g]
+
+---------- Data Generation Related Functions ----------
+-- Return columns: a, b, v_0, p, ratio
+getParams :: [Double] -> Double -> [(Double, Double, Double, Double, Double)]
+getParams xs ratio =
+  concat [[(a p v_0, b (a p v_0), v_0, p, ratio) | p <- xs] | v_0 <- v0s]
+    where
+      v0s = logspace 0.5 5 11
+      a p v_0 = hbar * sqrt ((p * ratio) / (m * v_0))
+      b a = a / ratio
 
 ---------- Do actual data generation ----------
---sampEqu = charEqu 1e-10 5e-10 3
---sampEqu = charEqu 1e-11 1e-11 0.5
-sampEqu = (uncurry3 charEqu) (inputs !! 315)
+sPowers = logspace 0.1 1000 31
+ratios = logspace 0.05 20 6
 
--- Vary everything and calculate everything
-a' = logspace 1e-10 5e-9 21    -- [m]
-b' = logspace 1e-10 5e-9 21    -- [m]
-v_0' = logspace 0.5 5 11       -- [eV]
+-- rawInputs: [(a, b, v_0, p, ratio)]
+rawInputs = concat $ map (getParams sPowers) ratios
 
-inputs = filter pred inputs'
+inputs = filter pred rawInputs
   where
-    inputs' = cartProd3 a' b' v_0'
-    pred (a,b,v) = if charEqu a b v 0 > 2.0 && charEqu a b v 0 < 1e10
-                    then True
-                    else False
-ps = map (uncurry3 scatteringPower) inputs
+    pred (a,b,v,_,_) = if charEqu a b v 0 > 2.0 && charEqu a b v 0 < 1e10
+                            then True
+                            else False
 
-equs = map (uncurry3 charEqu) inputs
-simpEqus = map (uncurry3 simpCharEqu) inputs
+equs = [charEqu a b v | (a,b,v,_,_) <- inputs]
+simpEqus = [simpCharEqu a b v | (a,b,v,_,_) <- inputs]
 
 firstEnergy = map (nthGapEnergy 1) equs
 simpFirstEnergy = map (nthGapEnergy 1) simpEqus
 
--- Display csv style
-displayData ins p normEnergy normSimpEnergy = do
-  putStrLn "a, b, v_0, p, norm energy, norm simp energy"
-  mapM_ putStrLn $ map csvify6 $ zip6 a b c p normEnergy normSimpEnergy
+-- Display data - csv style
+displayData ins normEnergy normSimpEnergy = do
+  putStrLn "a, b, ratio, v_0, p, norm energy, norm simp energy"
+  mapM_ putStrLn $ map csvify7 $ zip7 a b r v p normEnergy normSimpEnergy
     where
-      (a,b,c) = unzip3 ins
+      (a,b,v,p,r) = unzip5 ins
 
-main = displayData inputs ps normEnergy normSimpEnergy
+main = displayData inputs normEnergy normSimpEnergy
   where
     normSimpEnergy = map (uncurry normalize) $ zip a simpFirstEnergy
     normEnergy = map (uncurry normalize) $ zip a firstEnergy
-    (a,_,_) = unzip3 inputs
-
--- Plot energy band vs band number
---main = mapM_ putStrLn $ [show a ++ ", " ++ show b | (a,b) <- zip [1,2 ..] allowedWidths]
-
--- Plot band gaps vs band number
---main = mapM_ putStrLn $ [show a ++ ", " ++ show b | (a,b) <- zip [1,2 ..] forbiddenWidths]
-
--- Plot the characteristic equation
---e = [0.0, 0.01 ..]
---main = mapM_ putStrLn $ [show a ++ ", " ++ show b | (a,b) <- zip e (map sampEqu e)]
+    (a,_,_,_,_) = unzip5 inputs
